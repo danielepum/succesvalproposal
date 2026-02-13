@@ -1317,15 +1317,24 @@
             }, 1500);
         }
 
-        // Initialize NO button position - on top of YES button
+        // Initialize NO button position - far from YES button
         window.addEventListener('load', function() {
             const container = document.getElementById('buttonsContainer');
             const noBtn = document.getElementById('noBtn');
+            const yesBtn = document.querySelector('.yes-btn');
             
-            if (container && noBtn) {
+            if (container && noBtn && yesBtn) {
                 setTimeout(() => {
-                    noBtn.style.left = '0px';
-                    noBtn.style.top = '0px';
+                    const containerRect = container.getBoundingClientRect();
+                    const yesBtnRect = yesBtn.getBoundingClientRect();
+                    const noBtnRect = noBtn.getBoundingClientRect();
+                    
+                    // Position NO button far to the right and down from YES button
+                    const farLeft = containerRect.width - noBtnRect.width - 20;
+                    const farTop = containerRect.height - noBtnRect.height - 20;
+                    
+                    noBtn.style.left = farLeft + 'px';
+                    noBtn.style.top = farTop + 'px';
                 }, 100);
             }
         });
