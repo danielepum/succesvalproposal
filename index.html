@@ -1199,58 +1199,113 @@
             let attempts = 0;
             const minDistance = 300; // Minimum pixels away from YES button
             
-            // Keep trying until we find a position far from YES button
-            do {
-                randomX = Math.random() * maxX;
-                randomY = Math.random() * maxY;
+            // Define zones to ensure distribution across all areas
+            const zones = [
+                'top-left', 'top-right', 'bottom-left', 'bottom-right',
+                'left', 'right', 'top', 'bottom'
+            ];
+            
+            // Shuffle zones for randomness
+            const shuffledZones = zones.sort(() => Math.random() - 0.5);
+            
+            // Try each zone until we find a valid position
+            for (let zone of shuffledZones) {
+                attempts = 0;
                 
-                // Calculate distance from YES button
-                const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
-                const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
-                const noBtnCenterX = randomX + btnRect.width / 2;
-                const noBtnCenterY = randomY + btnRect.height / 2;
-                
-                const distance = Math.sqrt(
-                    Math.pow(noBtnCenterX - yesBtnCenterX, 2) + 
-                    Math.pow(noBtnCenterY - yesBtnCenterY, 2)
+                while (attempts < 10) {
+                    // Generate position based on zone
+                    switch(zone) {
+                        case 'top-left':
+                            randomX = Math.random() * (maxX * 0.3);
+                            randomY = Math.random() * (maxY * 0.3);
+                            break;
+                        case 'top-right':
+                            randomX = maxX * 0.7 + Math.random() * (maxX * 0.3);
+                            randomY = Math.random() * (maxY * 0.3);
+                            break;
+                        case 'bottom-left':
+                            randomX = Math.random() * (maxX * 0.3);
+                            randomY = maxY * 0.7 + Math.random() * (maxY * 0.3);
+                            break;
+                        case 'bottom-right':
+                            randomX = maxX * 0.7 + Math.random() * (maxX * 0.3);
+                            randomY = maxY * 0.7 + Math.random() * (maxY * 0.3);
+                            break;
+                        case 'left':
+                            randomX = Math.random() * (maxX * 0.25);
+                            randomY = maxY * 0.3 + Math.random() * (maxY * 0.4);
+                            break;
+                        case 'right':
+                            randomX = maxX * 0.75 + Math.random() * (maxX * 0.25);
+                            randomY = maxY * 0.3 + Math.random() * (maxY * 0.4);
+                            break;
+                        case 'top':
+                            randomX = maxX * 0.3 + Math.random() * (maxX * 0.4);
+                            randomY = Math.random() * (maxY * 0.25);
+                            break;
+                        case 'bottom':
+                            randomX = maxX * 0.3 + Math.random() * (maxX * 0.4);
+                            randomY = maxY * 0.75 + Math.random() * (maxY * 0.25);
+                            break;
+                    }
+                    
+                    // Calculate distance from YES button
+                    const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
+                    const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
+                    const noBtnCenterX = randomX + btnRect.width / 2;
+                    const noBtnCenterY = randomY + btnRect.height / 2;
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(noBtnCenterX - yesBtnCenterX, 2) + 
+                        Math.pow(noBtnCenterY - yesBtnCenterY, 2)
+                    );
+                    
+                    // Must be at least minDistance away from YES button
+                    if (distance > minDistance) {
+                        // Found a good position!
+                        noBtn.style.left = randomX + 'px';
+                        noBtn.style.top = randomY + 'px';
+                        
+                        // Shrink no button and grow yes button
+                        const currentYesSize = 1 + (noClickCount * 0.15);
+                        yesBtn.style.transform = `scale(${Math.min(currentYesSize, 2)})`;
+                        
+                        const currentNoSize = 1 - (noClickCount * 0.05);
+                        noBtn.style.transform = `scale(${Math.max(currentNoSize, 0.5)})`;
+                        return;
+                    }
+                    
+                    attempts++;
+                }
+            }
+            
+            // Fallback: force to farthest corner if no zone worked
+            const corners = [
+                {x: 20, y: 20}, // top left
+                {x: maxX, y: 20}, // top right
+                {x: 20, y: maxY}, // bottom left
+                {x: maxX, y: maxY} // bottom right
+            ];
+            
+            const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
+            const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
+            
+            let farthestCorner = corners[0];
+            let maxDist = 0;
+            
+            corners.forEach(corner => {
+                const cornerDist = Math.sqrt(
+                    Math.pow(corner.x + btnRect.width / 2 - yesBtnCenterX, 2) + 
+                    Math.pow(corner.y + btnRect.height / 2 - yesBtnCenterY, 2)
                 );
-                
-                // Must be at least minDistance away from YES button - keep trying!
-                if (distance > minDistance) {
-                    break;
+                if (cornerDist > maxDist) {
+                    maxDist = cornerDist;
+                    farthestCorner = corner;
                 }
-                
-                attempts++;
-                
-                // If we've tried too many times, force it to corners
-                if (attempts > 50) {
-                    const corners = [
-                        {x: 20, y: 20}, // top left
-                        {x: maxX, y: 20}, // top right
-                        {x: 20, y: maxY}, // bottom left
-                        {x: maxX, y: maxY} // bottom right
-                    ];
-                    
-                    // Pick the corner farthest from YES button
-                    let farthestCorner = corners[0];
-                    let maxDist = 0;
-                    
-                    corners.forEach(corner => {
-                        const cornerDist = Math.sqrt(
-                            Math.pow(corner.x + btnRect.width / 2 - yesBtnCenterX, 2) + 
-                            Math.pow(corner.y + btnRect.height / 2 - yesBtnCenterY, 2)
-                        );
-                        if (cornerDist > maxDist) {
-                            maxDist = cornerDist;
-                            farthestCorner = corner;
-                        }
-                    });
-                    
-                    randomX = farthestCorner.x;
-                    randomY = farthestCorner.y;
-                    break;
-                }
-            } while (true);
+            });
+            
+            randomX = farthestCorner.x;
+            randomY = farthestCorner.y;
             
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
