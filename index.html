@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine? 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Welcome Page */
+        .welcome-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-page::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounceIn 1s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .welcome-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .gif-container {
+            margin: 30px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .gif-container img {
+            max-width: 300px;
+            width: 80%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .enter-btn {
+            padding: 20px 60px;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            background: white;
+            color: #f5576c;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Photo Slideshow Page */
+        .slideshow-page {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slideshow-container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .slideshow-title {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: #f5576c;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .slideshow-images {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 30px 0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        .timeline-display {
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 20px;
+            animation: fadeIn 2s ease-in;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .countdown-item {
+            text-align: center;
+            animation: popIn 0.6s ease-out;
+        }
+
+        .countdown-item:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .countdown-item:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .countdown-item:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .countdown-value {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: bold;
+            color: #f5576c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .countdown-label {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .separator {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #f5576c;
+            font-weight: bold;
+        }
+
+        .timeline-message {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #333;
+            margin-top: 20px;
+            line-height: 1.6;
+            animation: fadeIn 2.5s ease-in;
+        }
+
+        .next-btn {
+            padding: 15px 40px;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+        }
+
+        /* Question Page */
+        .question-page {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hearts-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0.6;
+            animation: floatHeart linear infinite;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+
+        .question-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .question-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: #f5576c;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: bounceIn 1s ease-out;
+        }
+
+        .persuasion-box {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin: 30px auto;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #f5576c;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 600px;
+            animation: slideIn 0.5s ease-out;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .buttons-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 40px auto;
+        }
+
+        .yes-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 60px;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(132, 250, 176, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            z-index: 1;
+        }
+
+        .yes-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 15px 40px rgba(132, 250, 176, 0.6);
+        }
+
+        .no-btn {
+            position: absolute;
+            padding: 15px 40px;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .no-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Confirmation Page */
+        .confirmation-page {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confirmation-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .confirmation-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #f5576c;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: bounceIn 1s ease-out;
+        }
+
+        .confirmation-message {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #333;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .confirm-btn {
+            padding: 20px 50px;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(132, 250, 176, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .confirm-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(132, 250, 176, 0.6);
+        }
+
+        /* Success Page */
+        .success-page {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            background: white;
+            padding: 50px 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .success-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            color: #f5576c;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: bounceIn 1s ease-out;
+        }
+
+        .success-message {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .love-note {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #333;
+            line-height: 1.8;
+            animation: fadeIn 2s ease-in;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confettiFall linear infinite;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: fireworkExplode 1s ease-out forwards;
+        }
+
+        @keyframes fireworkExplode {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slideshow-images {
+                height: 300px;
+            }
+
+            .buttons-container {
+                height: 250px;
+            }
+
+            .success-content {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Music player styling */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .music-player button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .music-player button:hover {
+            transform: scale(1.1);
+        }
+
+        .music-info {
+            font-size: 14px;
+            color: #333;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+            .music-player {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px;
+            }
+            
+            .music-info {
+                display: none;
+            }
+        }
+
+        /* Hide music player on mobile screens */
+        @media (max-width: 768px) {
+            .music-player {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Player Control (Desktop only) -->
+    <div class="music-player" id="musicPlayer" style="display: none;">
+        <button id="musicToggle">▶️</button>
+        <div class="music-info">Background Music</div>
+    </div>
+
+    <!-- Welcome Page -->
+    <div class="welcome-page" id="welcomePage">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Hey Success! 💝</h1>
+            <p class="welcome-subtitle">I have something special to ask you...</p>
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif" alt="Romantic hearts">
+            </div>
+            <button class="enter-btn" onclick="startExperience()">Click to Continue 💕</button>
+        </div>
+    </div>
+
+    <!-- Photo Slideshow Page -->
+    <div class="slideshow-page" id="slideshowPage">
+        <div class="slideshow-container">
+            <h2 class="slideshow-title">Our Beautiful Moments Together 📸</h2>
+            
+            <div class="slideshow-images" id="slideshowImages">
+                <!-- Slides will be populated by JavaScript -->
+            </div>
+
+            <div class="timeline-display">
+                <div class="countdown-container">
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="months">0</div>
+                        <div class="countdown-label">Months</div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="days">0</div>
+                        <div class="countdown-label">Days</div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="hours">0</div>
+                        <div class="countdown-label">Hours</div>
+                    </div>
+                </div>
+                <p class="timeline-message">
+                    That's how long we've been creating amazing memories together! ❤️<br>
+                    Every moment with you has been magical! ✨
+                </p>
+            </div>
+
+            <button class="next-btn" onclick="showQuestion()">Continue 💕</button>
+        </div>
+    </div>
+
+    <!-- Question Page -->
+    <div class="question-page" id="questionPage">
+        <div class="hearts-background" id="heartsBackground"></div>
+        
+        <div class="question-content">
+            <h2 class="question-title">Success, Will You Be My Valentine? 💕</h2>
+            
+            <div class="persuasion-box" id="persuasionBox">
+                Click YES to make me the happiest person alive! 🥰
+            </div>
+
+            <div class="buttons-container" id="buttonsContainer">
+                <button class="yes-btn" onclick="sayYes()">YES! 💝</button>
+                <button class="no-btn" id="noBtn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Page -->
+    <div class="confirmation-page" id="confirmationPage">
+        <div class="confirmation-content">
+            <h2 class="confirmation-title">Wait... Really?! 🥺</h2>
+            <p class="confirmation-message">
+                You're actually saying YES?! 😍<br>
+                This isn't a mistake, right?<br>
+                Please confirm that you'll be my Valentine! 💕
+            </p>
+            <div class="confirmation-buttons">
+                <button class="confirm-btn" onclick="confirmYes()">Yes, I'm 100% Sure! 💖</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Page -->
+    <div class="success-page" id="successPage">
+        <div class="success-content">
+            <h1 class="success-title">YAAAAY!!! 🎉💕</h1>
+            <p class="success-message">
+                Success said YES! 😭💖<br>
+                This is the BEST DAY EVER! 🌟
+            </p>
+            
+            <div class="love-note">
+                <p style="margin-bottom: 15px;">
+                    Success, you've just made me the happiest person in the entire world! 🌍💝
+                </p>
+                <p style="margin-bottom: 15px;">
+                    I promise to make this Valentine's Day (and every day after) absolutely magical for you! ✨
+                </p>
+                <p style="margin-bottom: 15px;">
+                    Get ready for unlimited love, laughter, adventures, and all the happiness your heart can hold! 💕
+                </p>
+                <p style="margin-bottom: 15px;">
+                    Thank you for saying YES and for being the most amazing person ever! 🥰
+                </p>
+                <p style="font-weight: bold; color: #f5576c; font-size: 1.2em;">
+                    I love you more than words can express! 💖💖💖
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; font-size: clamp(3rem, 8vw, 6rem);">
+                💕 💖 💝 💗 💓 💞
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Photo URLs - Replace these with actual photo URLs
+        const photos = [
+            'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800',
+            'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800',
+            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800',
+            'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800',
+            'https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?w=800'
+        ];
+
+        // When we started dating
+        const startDate = new Date('2023-06-15'); // Change this to your actual start date
+
+        let currentSlide = 0;
+        let musicPlaying = false;
+
+        function startExperience() {
+            // Vibrate phone
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            
+            const welcomePage = document.getElementById('welcomePage');
+            const slideshowPage = document.getElementById('slideshowPage');
+            const musicPlayer = document.getElementById('musicPlayer');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            welcomePage.style.display = 'none';
+            slideshowPage.style.display = 'flex';
+            
+            // Show music player on desktop
+            if (window.innerWidth > 768) {
+                musicPlayer.style.display = 'flex';
+            }
+            
+            // Try to autoplay music
+            bgMusic.play().then(() => {
+                musicPlaying = true;
+                document.getElementById('musicToggle').textContent = '⏸️';
+            }).catch(error => {
+                console.log('Autoplay prevented:', error);
+            });
+            
+            initializeSlideshow();
+            calculateTimeTogether();
+        }
+
+        function initializeSlideshow() {
+            const container = document.getElementById('slideshowImages');
+            
+            photos.forEach((photo, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                if (index === 0) slide.classList.add('active');
+                
+                const img = document.createElement('img');
+                img.src = photo;
+                img.alt = `Memory ${index + 1}`;
+                
+                slide.appendChild(img);
+                container.appendChild(slide);
+            });
+
+            // Auto-advance slides
+            setInterval(() => {
+                const slides = document.querySelectorAll('.slide');
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 3000);
+        }
+
+        function calculateTimeTogether() {
+            const now = new Date();
+            const diff = now - startDate;
+            
+            const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            // Animate counting up
+            animateCount('months', 0, months, 2000);
+            animateCount('days', 0, days, 2000);
+            animateCount('hours', 0, hours, 2000);
+        }
+
+        function animateCount(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const range = end - start;
+            const increment = range / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    element.textContent = end;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 50);
+        }
+
+        function showQuestion() {
+            // Vibrate phone
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            
+            const slideshowPage = document.getElementById('slideshowPage');
+            const questionPage = document.getElementById('questionPage');
+            
+            slideshowPage.style.display = 'none';
+            questionPage.style.display = 'flex';
+            
+            createFloatingHearts();
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('heartsBackground');
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💝', '💞'];
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        // Persuasion messages
+        const messages = [
+            "Pretty please? 🥺",
+            "Please na, be my Val na 🙏💕",
+            "I will carry you round the world! 🌍✈️",
+            "Success, I'm begging you with all my heart! 🥺💔",
+            "I'll buy you all the chocolate you want! 🍫😋",
+            "Baby please, you're my everything! 😢💝",
+            "I can't imagine Valentine's without you! 💔😭",
+            "Come on, you know you want to say yes! 😊💝",
+            "I'll be the best Valentine EVER, I promise! 🌟💖",
+            "My heart will break into a million pieces! 💔😢",
+            "I'm literally on my knees begging! 🧎‍♂️🙏",
+            "Success, you're killing me here! 😫💕",
+            "Pretty pretty PRETTY please with sugar on top? 🍒🥺",
+            "I'll cook your favorite meal EVERY SINGLE DAY! 🍝❤️",
+            "Baby, don't do this to me! 😭💔",
+            "You're making me work so hard for this! 😅💪",
+            "I promise to treat you like a QUEEN! 👑💖",
+            "Just say yes already! You know you love me! 😂💕",
+            "I'm not giving up on us! Never! 💪❤️",
+            "I promise unlimited cuddles and kisses forever! 🤗💖",
+            "Success, I need you to be my Valentine! 🥺💝",
+            "The button is running because it knows I love you! 😜❤️",
+            "My love, I'm begging you pleaseeee! 🙏😢",
+            "Okay fine, I'll even do ALL the dishes FOREVER! 🧼😄",
+            "I'll give you the world and the stars! 🌍⭐💕",
+            "You're so stubborn but I love you MORE! 😍❤️",
+            "Success, please make me the happiest man alive! 🥺💝",
+            "I'm actually crying right now! 😭💔",
+            "Baby, I'll do ANYTHING for you! 🙏💖",
+            "You're my dream come true, please say yes! 💭💕",
+            "I'll carry you everywhere you want to go! 🚶‍♂️❤️",
+            "Think of all our amazing memories together! 💭💕",
+            "I promise to love you till infinity! ♾️💖",
+            "Success, you're my WHOLE WORLD! 🌍💝",
+            "Please baby, I'm begging on my knees! 🧎‍♂️😢",
+            "I'll buy you everything your heart desires! 🎁💕",
+            "You're my sunshine, my everything! ☀️❤️",
+            "I can't do this without you! 💔😭",
+            "Success, PLEASE be my Valentine! 🙏💖",
+            "I promise to make you smile EVERY DAY! 😊💕"
+        ];
+
+        let noClickCount = 0;
+
+        // Setup NO button behavior
+        const noBtn = document.getElementById('noBtn');
+
+        function sayNo() {
+            // Vibrate phone
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            
+            const persuasionBox = document.getElementById('persuasionBox');
+            const container = document.getElementById('buttonsContainer');
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            const yesBtn = document.querySelector('.yes-btn');
+            const yesBtnRect = yesBtn.getBoundingClientRect();
+            
+            // Update message
+            noClickCount++;
+            const messageIndex = Math.min(noClickCount, messages.length - 1);
+            persuasionBox.textContent = messages[messageIndex];
+            
+            // Reapply animation
+            persuasionBox.style.animation = 'none';
+            setTimeout(() => {
+                persuasionBox.style.animation = 'slideIn 0.5s ease-out';
+            }, 10);
+            
+            // Move button to random position (ensuring it stays away from YES button)
+            const maxX = containerRect.width - btnRect.width - 20;
+            const maxY = containerRect.height - btnRect.height - 20;
+            
+            let randomX, randomY;
+            let attempts = 0;
+            
+            // Keep trying until we find a position far from YES button
+            do {
+                randomX = Math.random() * maxX;
+                randomY = Math.random() * maxY;
+                
+                // Calculate distance from YES button
+                const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
+                const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
+                const noBtnCenterX = randomX + btnRect.width / 2;
+                const noBtnCenterY = randomY + btnRect.height / 2;
+                
+                const distance = Math.sqrt(
+                    Math.pow(noBtnCenterX - yesBtnCenterX, 2) + 
+                    Math.pow(noBtnCenterY - yesBtnCenterY, 2)
+                );
+                
+                // Must be at least 150px away from YES button
+                if (distance > 150 || attempts > 20) {
+                    break;
+                }
+                attempts++;
+            } while (true);
+            
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            
+            // Shrink no button and grow yes button
+            const currentYesSize = 1 + (noClickCount * 0.15);
+            yesBtn.style.transform = `scale(${Math.min(currentYesSize, 2)})`;
+            
+            const currentNoSize = 1 - (noClickCount * 0.05);
+            noBtn.style.transform = `scale(${Math.max(currentNoSize, 0.5)})`;
+        }
+
+        // Click handler for NO button
+        noBtn.addEventListener('click', sayNo);
+        noBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            sayNo();
+        });
+
+        function sayYes() {
+            // Vibrate phone (success pattern)
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+            
+            const yesBtn = document.querySelector('.yes-btn');
+            yesBtn.innerHTML = '🥹🥹🥹';
+            
+            setTimeout(() => {
+                const questionPage = document.getElementById('questionPage');
+                const confirmationPage = document.getElementById('confirmationPage');
+                
+                questionPage.style.display = 'none';
+                confirmationPage.style.display = 'flex';
+            }, 500);
+        }
+
+        function confirmYes() {
+            // Vibrate phone (success pattern)
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 300]);
+            }
+            
+            const confirmationPage = document.getElementById('confirmationPage');
+            const successPage = document.getElementById('successPage');
+            
+            confirmationPage.style.display = 'none';
+            successPage.style.display = 'flex';
+            
+            // Background music continues playing
+            
+            createConfetti();
+            createFireworks();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#f093fb', '#fee140', '#fa709a', '#ffecd2'];
+            
+            for (let i = 0; i < 150; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                document.getElementById('successPage').appendChild(confetti);
+            }
+        }
+
+        function createFireworks() {
+            const colors = ['#ff6b9d', '#f093fb', '#fee140', '#fa709a', '#ffecd2', '#ff0000', '#00ff00', '#0000ff'];
+            
+            setInterval(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * (window.innerHeight / 2);
+                
+                for (let i = 0; i < 30; i++) {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.left = x + 'px';
+                    firework.style.top = y + 'px';
+                    firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    const angle = (Math.PI * 2 * i) / 30;
+                    const velocity = 50 + Math.random() * 50;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity;
+                    
+                    firework.style.setProperty('--x', vx + 'px');
+                    firework.style.setProperty('--y', vy + 'px');
+                    
+                    document.getElementById('successPage').appendChild(firework);
+                    
+                    setTimeout(() => firework.remove(), 1000);
+                }
+            }, 1500);
+        }
+
+        // Initialize NO button position - on top of YES button
+        window.addEventListener('load', function() {
+            const container = document.getElementById('buttonsContainer');
+            const noBtn = document.getElementById('noBtn');
+            
+            if (container && noBtn) {
+                setTimeout(() => {
+                    noBtn.style.left = '0px';
+                    noBtn.style.top = '0px';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
