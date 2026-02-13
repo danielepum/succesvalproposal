@@ -1205,6 +1205,7 @@
         ];
 
         let noClickCount = 0;
+        let positionHistory = []; // Track recent positions to prevent directional repetition
 
         // Setup NO button behavior
         const noBtn = document.getElementById('noBtn');
@@ -1220,7 +1221,6 @@
             const containerRect = container.getBoundingClientRect();
             const btnRect = noBtn.getBoundingClientRect();
             const yesBtn = document.querySelector('.yes-btn');
-            const yesBtnRect = yesBtn.getBoundingClientRect();
             
             // Update message
             noClickCount++;
@@ -1233,7 +1233,7 @@
                 persuasionBox.style.animation = 'slideIn 0.5s ease-out';
             }, 10);
             
-            // Move button to random position (ensuring it stays away from YES button and current position)
+            // Move button to random position anywhere on the page
             const maxX = containerRect.width - btnRect.width - 20;
             const maxY = containerRect.height - btnRect.height - 20;
             
@@ -1242,121 +1242,104 @@
             const currentNoBtnY = noBtn.offsetTop;
             
             let randomX, randomY;
-            let attempts = 0;
-            const minDistance = 300; // Minimum pixels away from YES button
-            const minDistanceFromCurrent = 200; // Minimum pixels from current position
+            let foundValidPosition = false;
+            const minDistanceFromCurrent = 150; // Minimum pixels from current position
             
-            // Define zones to ensure distribution across all areas
-            const zones = [
-                'top-left', 'top-right', 'bottom-left', 'bottom-right',
-                'left', 'right', 'top', 'bottom'
-            ];
+            // Divide the screen into 9 zones (3x3 grid)
+            const horizontalZoneSize = maxX / 3; // left, center, right
+            const verticalZoneSize = maxY / 3;   // top, middle, bottom
             
-            // Shuffle zones for randomness
-            const shuffledZones = zones.sort(() => Math.random() - 0.5);
-            
-            // Try each zone until we find a valid position
-            for (let zone of shuffledZones) {
-                attempts = 0;
+            // Try up to 100 times to find a valid position
+            for (let attempt = 0; attempt < 100; attempt++) {
+                // Generate completely random position ANYWHERE on the page
+                randomX = Math.random() * maxX;
+                randomY = Math.random() * maxY;
                 
-                while (attempts < 10) {
-                    // Generate position based on zone
-                    switch(zone) {
-                        case 'top-left':
-                            randomX = Math.random() * (maxX * 0.3);
-                            randomY = Math.random() * (maxY * 0.3);
-                            break;
-                        case 'top-right':
-                            randomX = maxX * 0.7 + Math.random() * (maxX * 0.3);
-                            randomY = Math.random() * (maxY * 0.3);
-                            break;
-                        case 'bottom-left':
-                            randomX = Math.random() * (maxX * 0.3);
-                            randomY = maxY * 0.7 + Math.random() * (maxY * 0.3);
-                            break;
-                        case 'bottom-right':
-                            randomX = maxX * 0.7 + Math.random() * (maxX * 0.3);
-                            randomY = maxY * 0.7 + Math.random() * (maxY * 0.3);
-                            break;
-                        case 'left':
-                            randomX = Math.random() * (maxX * 0.25);
-                            randomY = maxY * 0.3 + Math.random() * (maxY * 0.4);
-                            break;
-                        case 'right':
-                            randomX = maxX * 0.75 + Math.random() * (maxX * 0.25);
-                            randomY = maxY * 0.3 + Math.random() * (maxY * 0.4);
-                            break;
-                        case 'top':
-                            randomX = maxX * 0.3 + Math.random() * (maxX * 0.4);
-                            randomY = Math.random() * (maxY * 0.25);
-                            break;
-                        case 'bottom':
-                            randomX = maxX * 0.3 + Math.random() * (maxX * 0.4);
-                            randomY = maxY * 0.75 + Math.random() * (maxY * 0.25);
-                            break;
+                // Calculate distance from current NO button position
+                const distanceFromCurrent = Math.sqrt(
+                    Math.pow(randomX - currentNoBtnX, 2) + 
+                    Math.pow(randomY - currentNoBtnY, 2)
+                );
+                
+                // Determine which zone this position is in
+                const horizontalZone = Math.floor(randomX / horizontalZoneSize); // 0=left, 1=center, 2=right
+                const verticalZone = Math.floor(randomY / verticalZoneSize);     // 0=top, 1=middle, 2=bottom
+                const zoneKey = `${horizontalZone}-${verticalZone}`;
+                
+                // Check if this zone was used in the last 5 positions
+                const recentZones = positionHistory.slice(-5);
+                const zoneRecentlyUsed = recentZones.includes(zoneKey);
+                
+                // Position is valid if:
+                // 1. It's far enough from current position AND
+                // 2. Either we have less than 5 positions in history OR this zone wasn't recently used
+                if (distanceFromCurrent > minDistanceFromCurrent && 
+                    (positionHistory.length < 5 || !zoneRecentlyUsed)) {
+                    foundValidPosition = true;
+                    
+                    // Add this zone to history
+                    positionHistory.push(zoneKey);
+                    
+                    // Keep only the last 10 positions in history
+                    if (positionHistory.length > 10) {
+                        positionHistory.shift();
                     }
+                    break;
+                }
+            }
+            
+            // If still no valid position found, just ensure it's far from current position
+            if (!foundValidPosition) {
+                for (let attempt = 0; attempt < 50; attempt++) {
+                    randomX = Math.random() * maxX;
+                    randomY = Math.random() * maxY;
                     
-                    // Calculate distance from YES button
-                    const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
-                    const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
-                    const noBtnCenterX = randomX + btnRect.width / 2;
-                    const noBtnCenterY = randomY + btnRect.height / 2;
-                    
-                    const distanceFromYes = Math.sqrt(
-                        Math.pow(noBtnCenterX - yesBtnCenterX, 2) + 
-                        Math.pow(noBtnCenterY - yesBtnCenterY, 2)
-                    );
-                    
-                    // Calculate distance from current NO button position
                     const distanceFromCurrent = Math.sqrt(
                         Math.pow(randomX - currentNoBtnX, 2) + 
                         Math.pow(randomY - currentNoBtnY, 2)
                     );
                     
-                    // Must be at least minDistance away from YES button AND away from current position
-                    if (distanceFromYes > minDistance && distanceFromCurrent > minDistanceFromCurrent) {
-                        // Found a good position!
-                        noBtn.style.left = randomX + 'px';
-                        noBtn.style.top = randomY + 'px';
+                    if (distanceFromCurrent > minDistanceFromCurrent) {
+                        // Add to history even if zone was recently used
+                        const horizontalZone = Math.floor(randomX / horizontalZoneSize);
+                        const verticalZone = Math.floor(randomY / verticalZoneSize);
+                        const zoneKey = `${horizontalZone}-${verticalZone}`;
+                        positionHistory.push(zoneKey);
                         
-                        // Only grow YES button, NO button stays same size
-                        const currentYesSize = 1 + (noClickCount * 0.15);
-                        yesBtn.style.transform = `scale(${Math.min(currentYesSize, 2)})`;
-                        return;
+                        if (positionHistory.length > 10) {
+                            positionHistory.shift();
+                        }
+                        foundValidPosition = true;
+                        break;
                     }
-                    
-                    attempts++;
                 }
             }
             
-            // Fallback: force to farthest corner if no zone worked
-            const corners = [
-                {x: 20, y: 20}, // top left
-                {x: maxX, y: 20}, // top right
-                {x: 20, y: maxY}, // bottom left
-                {x: maxX, y: maxY} // bottom right
-            ];
-            
-            const yesBtnCenterX = yesBtnRect.left - containerRect.left + yesBtnRect.width / 2;
-            const yesBtnCenterY = yesBtnRect.top - containerRect.top + yesBtnRect.height / 2;
-            
-            let farthestCorner = corners[0];
-            let maxDist = 0;
-            
-            corners.forEach(corner => {
-                const cornerDist = Math.sqrt(
-                    Math.pow(corner.x + btnRect.width / 2 - yesBtnCenterX, 2) + 
-                    Math.pow(corner.y + btnRect.height / 2 - yesBtnCenterY, 2)
-                );
-                if (cornerDist > maxDist) {
-                    maxDist = cornerDist;
-                    farthestCorner = corner;
+            // Last resort fallback - move to opposite corner
+            if (!foundValidPosition) {
+                if (currentNoBtnX < maxX / 2) {
+                    randomX = maxX * 0.75 + Math.random() * (maxX * 0.25);
+                } else {
+                    randomX = Math.random() * (maxX * 0.25);
                 }
-            });
+                
+                if (currentNoBtnY < maxY / 2) {
+                    randomY = maxY * 0.75 + Math.random() * (maxY * 0.25);
+                } else {
+                    randomY = Math.random() * (maxY * 0.25);
+                }
+                
+                const horizontalZone = Math.floor(randomX / horizontalZoneSize);
+                const verticalZone = Math.floor(randomY / verticalZoneSize);
+                const zoneKey = `${horizontalZone}-${verticalZone}`;
+                positionHistory.push(zoneKey);
+                
+                if (positionHistory.length > 10) {
+                    positionHistory.shift();
+                }
+            }
             
-            randomX = farthestCorner.x;
-            randomY = farthestCorner.y;
-            
+            // Apply the new position
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
             
