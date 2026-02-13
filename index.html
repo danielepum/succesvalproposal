@@ -1196,6 +1196,7 @@
             
             let randomX, randomY;
             let attempts = 0;
+            const minDistance = 300; // Minimum pixels away from YES button
             
             // Keep trying until we find a position far from YES button
             do {
@@ -1213,11 +1214,41 @@
                     Math.pow(noBtnCenterY - yesBtnCenterY, 2)
                 );
                 
-                // Must be at least 400px away from YES button
-                if (distance > 400 || attempts > 20) {
+                // Must be at least minDistance away from YES button - keep trying!
+                if (distance > minDistance) {
                     break;
                 }
+                
                 attempts++;
+                
+                // If we've tried too many times, force it to corners
+                if (attempts > 50) {
+                    const corners = [
+                        {x: 20, y: 20}, // top left
+                        {x: maxX, y: 20}, // top right
+                        {x: 20, y: maxY}, // bottom left
+                        {x: maxX, y: maxY} // bottom right
+                    ];
+                    
+                    // Pick the corner farthest from YES button
+                    let farthestCorner = corners[0];
+                    let maxDist = 0;
+                    
+                    corners.forEach(corner => {
+                        const cornerDist = Math.sqrt(
+                            Math.pow(corner.x + btnRect.width / 2 - yesBtnCenterX, 2) + 
+                            Math.pow(corner.y + btnRect.height / 2 - yesBtnCenterY, 2)
+                        );
+                        if (cornerDist > maxDist) {
+                            maxDist = cornerDist;
+                            farthestCorner = corner;
+                        }
+                    });
+                    
+                    randomX = farthestCorner.x;
+                    randomY = farthestCorner.y;
+                    break;
+                }
             } while (true);
             
             noBtn.style.left = randomX + 'px';
