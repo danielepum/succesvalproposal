@@ -58,6 +58,7 @@
             margin-bottom: 20px;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
             animation: bounceIn 1s ease-out;
+            white-space: nowrap;
         }
 
         @keyframes bounceIn {
@@ -108,6 +109,7 @@
             transition: all 0.3s ease;
             font-weight: bold;
             animation: pulse 2s infinite;
+            white-space: nowrap;
         }
 
         @keyframes pulse {
@@ -342,6 +344,15 @@
             cursor: pointer;
             animation: fall linear;
             user-select: none;
+        }
+
+        .falling-bomb {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            animation: fall linear;
+            user-select: none;
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.5));
         }
 
         @keyframes fall {
@@ -848,7 +859,7 @@
     <div class="game-page" id="gamePage">
         <div class="game-container">
             <h2 class="game-title">Catch My Love! 💝</h2>
-            <p class="game-instructions">Catch 10 hearts to continue! Tap or click on the falling hearts! 💕</p>
+            <p class="game-instructions">Catch 10 hearts to continue! Tap hearts 💕 for +1 point. Avoid bombs 💣 or lose 2 points!</p>
             
             <div class="score-display" id="scoreDisplay">Hearts Caught: <span id="score">0</span>/10</div>
             
@@ -1014,39 +1025,70 @@
             if (!gameActive) return;
             
             const gameArea = document.getElementById('gameArea');
-            const heart = document.createElement('div');
-            heart.className = 'falling-heart';
-            heart.textContent = ['❤️', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
-            heart.style.left = Math.random() * (gameArea.offsetWidth - 40) + 'px';
-            heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            const element = document.createElement('div');
             
-            heart.addEventListener('click', function() {
-                catchHeart(this);
+            // 20% chance to create a bomb instead of a heart
+            const isBomb = Math.random() < 0.2;
+            
+            if (isBomb) {
+                element.className = 'falling-bomb';
+                element.textContent = '💣';
+                element.dataset.type = 'bomb';
+            } else {
+                element.className = 'falling-heart';
+                element.textContent = ['❤️', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
+                element.dataset.type = 'heart';
+            }
+            
+            element.style.left = Math.random() * (gameArea.offsetWidth - 40) + 'px';
+            element.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            
+            element.addEventListener('click', function() {
+                catchItem(this);
             });
             
-            heart.addEventListener('touchstart', function(e) {
+            element.addEventListener('touchstart', function(e) {
                 e.preventDefault();
-                catchHeart(this);
+                catchItem(this);
             });
             
-            gameArea.appendChild(heart);
+            gameArea.appendChild(element);
             
             setTimeout(() => {
-                if (heart.parentNode) {
-                    heart.remove();
+                if (element.parentNode) {
+                    element.remove();
                 }
             }, 5000);
         }
 
-        function catchHeart(heartElement) {
-            heartElement.style.animation = 'none';
-            heartElement.style.transform = 'scale(1.5)';
-            heartElement.style.opacity = '0';
+        function catchItem(element) {
+            const itemType = element.dataset.type;
             
-            score++;
-            document.getElementById('score').textContent = score;
+            element.style.animation = 'none';
+            element.style.transform = 'scale(1.5)';
+            element.style.opacity = '0';
             
-            setTimeout(() => heartElement.remove(), 300);
+            if (itemType === 'bomb') {
+                // Bomb clicked - lose 2 points
+                score = Math.max(0, score - 2); // Don't go below 0
+                document.getElementById('score').textContent = score;
+                
+                // Vibrate for bomb (if available)
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            } else {
+                // Heart clicked - gain 1 point
+                score++;
+                document.getElementById('score').textContent = score;
+                
+                // Vibrate for heart (if available)
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+            
+            setTimeout(() => element.remove(), 300);
             
             if (score >= 10) {
                 gameActive = false;
@@ -1191,13 +1233,18 @@
                 persuasionBox.style.animation = 'slideIn 0.5s ease-out';
             }, 10);
             
-            // Move button to random position (ensuring it stays away from YES button)
+            // Move button to random position (ensuring it stays away from YES button and current position)
             const maxX = containerRect.width - btnRect.width - 20;
             const maxY = containerRect.height - btnRect.height - 20;
+            
+            // Get current position of NO button
+            const currentNoBtnX = noBtn.offsetLeft;
+            const currentNoBtnY = noBtn.offsetTop;
             
             let randomX, randomY;
             let attempts = 0;
             const minDistance = 300; // Minimum pixels away from YES button
+            const minDistanceFromCurrent = 200; // Minimum pixels from current position
             
             // Define zones to ensure distribution across all areas
             const zones = [
@@ -1255,23 +1302,26 @@
                     const noBtnCenterX = randomX + btnRect.width / 2;
                     const noBtnCenterY = randomY + btnRect.height / 2;
                     
-                    const distance = Math.sqrt(
+                    const distanceFromYes = Math.sqrt(
                         Math.pow(noBtnCenterX - yesBtnCenterX, 2) + 
                         Math.pow(noBtnCenterY - yesBtnCenterY, 2)
                     );
                     
-                    // Must be at least minDistance away from YES button
-                    if (distance > minDistance) {
+                    // Calculate distance from current NO button position
+                    const distanceFromCurrent = Math.sqrt(
+                        Math.pow(randomX - currentNoBtnX, 2) + 
+                        Math.pow(randomY - currentNoBtnY, 2)
+                    );
+                    
+                    // Must be at least minDistance away from YES button AND away from current position
+                    if (distanceFromYes > minDistance && distanceFromCurrent > minDistanceFromCurrent) {
                         // Found a good position!
                         noBtn.style.left = randomX + 'px';
                         noBtn.style.top = randomY + 'px';
                         
-                        // Shrink no button and grow yes button
+                        // Only grow YES button, NO button stays same size
                         const currentYesSize = 1 + (noClickCount * 0.15);
                         yesBtn.style.transform = `scale(${Math.min(currentYesSize, 2)})`;
-                        
-                        const currentNoSize = 1 - (noClickCount * 0.05);
-                        noBtn.style.transform = `scale(${Math.max(currentNoSize, 0.5)})`;
                         return;
                     }
                     
@@ -1310,12 +1360,9 @@
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
             
-            // Shrink no button and grow yes button
+            // Only grow YES button, NO button stays same size
             const currentYesSize = 1 + (noClickCount * 0.15);
             yesBtn.style.transform = `scale(${Math.min(currentYesSize, 2)})`;
-            
-            const currentNoSize = 1 - (noClickCount * 0.05);
-            noBtn.style.transform = `scale(${Math.max(currentNoSize, 0.5)})`;
         }
 
         // Click handler for NO button
